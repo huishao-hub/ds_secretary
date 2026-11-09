@@ -1,5 +1,10 @@
 # 资源说明（NOTICE）
 
+## 许可范围
+
+- **代码**（`app/`、`service/`、`plugin/`、`tools/`、`tests/` 下的源码）：MIT，见 [LICENSE](LICENSE)。
+- **角色美术资源**（`assets/character/` 下的立绘与派生图层）：**不在 MIT 范围内**，见下方说明。
+
 本仓库的**代码**采用 MIT 许可（见 [LICENSE](LICENSE)）。以下**美术与音频资源**不在 MIT 覆盖范围内。
 
 ## 角色立绘
