@@ -1,0 +1,143 @@
+{
+  "name": "xi",
+  "displayName": "汐",
+  "canvas": {
+    "w": 850,
+    "h": 1275
+  },
+  "neckY": 285,
+  "pivot": {
+    "x": 418,
+    "y": 262
+  },
+  "parts": [
+    {
+      "id": "body",
+      "file": "layers/body.png",
+      "x": 0,
+      "y": 269,
+      "w": 850,
+      "h": 1006,
+      "z": 10
+    },
+    {
+      "id": "head",
+      "x": 0,
+      "y": 0,
+      "w": 850,
+      "h": 285,
+      "z": 20,
+      "pivot": {
+        "x": 418,
+        "y": 262
+      },
+      "variants": {
+        "talk": {
+          "file": "layers/head-talk.png",
+          "w": 850,
+          "h": 285
+        },
+        "idle": {
+          "file": "layers/head-idle.png",
+          "w": 850,
+          "h": 285
+        },
+        "blink": {
+          "file": "layers/head-blink.png",
+          "w": 850,
+          "h": 285
+        },
+        "happy": {
+          "file": "layers/head-happy.png",
+          "w": 850,
+          "h": 285
+        }
+      },
+      "default": "idle"
+    }
+  ],
+  "eyes": {
+    "l": {
+      "x": 350,
+      "y": 169,
+      "w": 58,
+      "h": 35
+    },
+    "r": {
+      "x": 408,
+      "y": 147,
+      "w": 57,
+      "h": 44
+    }
+  },
+  "mouth": {
+    "x": 395,
+    "y": 211,
+    "w": 54,
+    "h": 35
+  },
+  "fx": {
+    "sweat": {
+      "x": 474,
+      "y": 128,
+      "w": 26,
+      "h": 34
+    },
+    "zzz": {
+      "x": 498,
+      "y": 90,
+      "w": 74,
+      "h": 62
+    },
+    "sparkle": {
+      "x": 596,
+      "y": 112,
+      "w": 96,
+      "h": 96
+    },
+    "exclaim": {
+      "x": 610,
+      "y": 92,
+      "w": 26,
+      "h": 46
+    },
+    "think": {
+      "x": 556,
+      "y": 116,
+      "w": 60,
+      "h": 24
+    },
+    "anger": {
+      "x": 612,
+      "y": 108,
+      "w": 44,
+      "h": 40
+    }
+  },
+  "palette": {
+    "eye-l": {
+      "lash": [
+        18,
+        9,
+        36
+      ]
+    },
+    "eye-r": {
+      "lash": [
+        10,
+        11,
+        42
+      ]
+    },
+    "mouth": [
+      0,
+      0,
+      9
+    ]
+  },
+  "anchor": {
+    "feetY": 1269,
+    "topY": 0
+  },
+  "notes": "head 有 5 个表情变体（idle/talk/blink/half/happy），WPF 端双层交叉淡入；身体与头部绕颈部枢轴做连续变换。"
+}

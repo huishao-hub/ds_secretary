@@ -1,0 +1,23 @@
+{
+  "name": "@local/dsh-ai-secretary",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AI Personal Secretary — 桌宠秘书：本地规划引擎 + 透明桌面角色 + 时间规划中心。",
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

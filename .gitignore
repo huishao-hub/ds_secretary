@@ -1,0 +1,30 @@
+# ---------- 密钥与个人数据（绝不入库）----------
+data/
+logs/
+service/config.local.json
+*.db
+*.db-shm
+*.db-wal
+*.pid
+bridge.json
+cache-*.json
+
+# ---------- 中间产物 ----------
+assets/character/build/
+assets/character/_*.png
+node_modules/
+*.tmp
+*.log
+
+# ---------- 本次开发用的一次性脚本 ----------
+tools/patch_*.py
+tools/fix_*.py
+
+# ---------- 系统 ----------
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ---------- Python ----------
+__pycache__/
+*.pyc

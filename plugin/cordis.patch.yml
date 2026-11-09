@@ -1,0 +1,16 @@
+# 旧桌宠（海绵宝宝）改用新版 AI 秘书，停用旧行避免同时出现两个桌宠
+- id: kaguya-pet
+  disabled: true
+
+- insert:
+    - id: ai-secretary
+      name: '@local/dsh-ai-secretary'
+      config:
+        enabled: true
+        # 应用根目录（桌宠 + 规划引擎 + 数据都在这里）
+        root: 'D:\AI-Secretary'
+        # 是否由本插件拉起本地规划服务与桌宠
+        launchService: true
+        launchPet: true
+        # 是否把计划管理注册成 Agent 工具
+        registerTools: true

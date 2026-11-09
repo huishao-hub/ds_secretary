@@ -1,0 +1,4 @@
+{
+  "_说明": "复制成 config.local.json 后填入你自己的 Key。这个文件不进版本库。",
+  "apiKey": "sk-your-key-here"
+}
