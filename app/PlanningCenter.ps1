@@ -1,4 +1,4 @@
-﻿﻿﻿﻿#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
   AI Personal Secretary · 时间规划中心
   三栏：左（长期目标 / 待安排池 / 搜索） 中（多尺度时间轴 + 甘特） 右（AI 对话 / 建议 / 冲突）

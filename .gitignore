@@ -9,6 +9,9 @@ service/config.local.json
 bridge.json
 cache-*.json
 
+# ---------- 本地备份 ----------
+backup/
+
 # ---------- 中间产物 ----------
 assets/character/build/
 assets/character/_*.png

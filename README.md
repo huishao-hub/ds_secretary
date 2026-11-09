@@ -27,6 +27,19 @@ powershell -NoProfile -ExecutionPolicy Bypass -File app\launch.ps1
 > 仓库里**不含**运行数据：`data/`（SQLite、token、桌宠位置）、`logs/`、以及 `service/config.local.json` 里的 Key。
 > 角色立绘在 `assets/character/`，仅个人使用，别分发。
 
+## 0.5 出问题先跑自检
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File D:\AI-Secretary\tools\selfcheck.ps1
+```
+
+一条命令检查 15 项：Node 版本、引擎进程与 `/health`、数据库可读、API Key、桌宠/规划中心进程、
+桌宠日志有无 FATAL、DSH 插件是否装入 profile、`secretary_*` 工具是否注册、旧插件是否残留、备份是否存在。
+输出 `OK/WARN/FAIL` 汇总，退出码 0=没有 FAIL。
+
+**DSH 升级后建议跑一次**：升级可能带来两件事 —— ① `tools` 服务挂载时机变化导致插件工具注册失败；
+② profile 补丁被覆盖导致旧插件重新启用。这两项自检里都有专门检查。
+
 ## 1. 现在就能跑起来（3 步）
 
 ```powershell

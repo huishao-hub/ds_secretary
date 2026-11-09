@@ -1,4 +1,4 @@
-$files = @(
+﻿$files = @(
     'D:\AI-Secretary\app\Pet.ps1',
     'D:\AI-Secretary\app\PlanningCenter.ps1',
     'D:\AI-Secretary\app\lib\Bridge.ps1'
