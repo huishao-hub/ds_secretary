@@ -41,7 +41,7 @@ export function apply(ctx, config = {}) {
 
   const note = (line) => {
     try {
-      const stamp = new Date().toISOString().slice(11, 19)
+      const stamp = new Date().toTimeString().slice(0, 8)   // 本地时间，别用 UTC
       appendFileSync(join(logDir, 'plugin.log'), `${stamp}  ${line}\n`, 'utf8')
     } catch { /* logging is best effort */ }
   }
@@ -171,17 +171,24 @@ export function apply(ctx, config = {}) {
   }
 
   // ---------------- Agent 工具 ----------------
-  const tools = ctx.get?.('tools')
-  if (cfg.registerTools !== false && tools) {
-    const define = (definition) => {
-      try {
-        const dispose = tools.register(definition)
-        ctx.effect(() => dispose)
-        note(`tool registered: ${definition.name}`)
-      } catch (error) {
-        note(`tool register failed ${definition.name}: ${error.message}`)
+  // 注意：tools 服务的挂载时机不保证早于本插件（DSH 44.x 起实测如此），
+  // 直接 ctx.get('tools') 会拿到 undefined；用 ctx.inject 等它就绪再注册。
+  if (cfg.registerTools !== false) {
+    ctx.inject(['tools'], (toolCtx) => {
+      const tools = toolCtx.tools || toolCtx.get?.('tools')
+      if (!tools) {
+        note('tools unavailable inside inject scope; skip')
+        return
       }
-    }
+      const define = (definition) => {
+        try {
+          const dispose = tools.register(definition)
+          toolCtx.effect?.(() => dispose)
+          note(`tool registered: ${definition.name}`)
+        } catch (error) {
+          note(`tool register failed ${definition.name}: ${error.message}`)
+        }
+      }
 
     const textRender = (args, value) => [
       { type: 'text', text: typeof value === 'string' ? value : JSON.stringify(value, null, 2) },
@@ -272,8 +279,8 @@ export function apply(ctx, config = {}) {
         return { opened: true, script }
       },
     })
-  } else if (cfg.registerTools !== false) {
-    note('tools service unavailable; skipping tool registration')
+      note('tools ready: secretary tools registered')
+    })
   }
 
   // ---------------- 生命周期 ----------------
