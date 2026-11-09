@@ -179,9 +179,11 @@ public static class PetNative {
               Background="#FAFFFFFF" BorderBrush="#336FA8FF" BorderThickness="1">
         <Border.Effect><DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.20"/></Border.Effect>
         <StackPanel>
-          <TextBlock x:Name="ReplyText" Text="" TextWrapping="Wrap" Foreground="#1F2A3C" MaxHeight="130"
-                     Visibility="Collapsed" Margin="2,0,2,8" LineHeight="19"/>
-          <Grid>
+          <ScrollViewer x:Name="ChatScroll" MaxHeight="240" VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled">
+            <StackPanel x:Name="ChatStack"/>
+          </ScrollViewer>
+          <Grid Margin="0,6,0,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <TextBox x:Name="ChatInput" Grid.Column="0" Height="26" BorderThickness="1" BorderBrush="#3A6FA8FF"
                      Background="#FFFFFFFF" VerticalContentAlignment="Center" MaxLength="300" Padding="6,0"/>
@@ -232,7 +234,9 @@ public static class PetNative {
     $chatPanel = $win.FindName('ChatPanel')
     $chatInput = $win.FindName('ChatInput')
     $chatSend = $win.FindName('ChatSend')
-    $replyText = $win.FindName('ReplyText')
+    $chatScroll = $win.FindName('ChatScroll')
+    $script:chatInputBox = $chatInput
+    $chatStack = $win.FindName('ChatStack')
     $menuPanel = $win.FindName('MenuPanel')
     $menuGrid = $win.FindName('MenuGrid')
     $reminderPanel = $win.FindName('ReminderPanel')
@@ -512,11 +516,43 @@ public static class PetNative {
     }
 
     # ================= 聊天 =================
+    # 去掉最后一条"……"占位气泡
+    function Remove-LastPetChat {
+        try {
+            if ($chatStack.Children.Count -gt 0) {
+                $chatStack.Children.RemoveAt($chatStack.Children.Count - 1)
+                Set-PanelHeight
+            }
+        } catch { }
+    }
+
+    function Add-PetChat([string]$who, [string]$text, [string]$color = '') {
+        try {
+            if (-not $text) { return }
+            $b = New-Object System.Windows.Controls.Border
+            $b.CornerRadius = [System.Windows.CornerRadius]::new(9)
+            $b.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString($(if ($who -eq 'me') { '#DCE9FF' } else { '#F1F4F9' }))
+            $b.Padding = [System.Windows.Thickness]::new(8, 5, 8, 5)
+            $b.Margin = [System.Windows.Thickness]::new(0, 0, 0, 5)
+            $b.MaxWidth = 252
+            $b.HorizontalAlignment = $(if ($who -eq 'me') { 'Right' } else { 'Left' })
+            $t = New-Object System.Windows.Controls.TextBlock
+            $t.Text = $text
+            $t.TextWrapping = 'Wrap'
+            $t.FontSize = 12
+            $t.LineHeight = 18
+            $t.Foreground = [System.Windows.Media.BrushConverter]::new().ConvertFromString($(if ($color) { $color } elseif ($who -eq 'me') { '#1F2A3C' } else { '#1F2A3C' }))
+            $b.Child = $t
+            [void]$chatStack.Children.Add($b)
+            Set-PanelHeight
+            try { $chatScroll.ScrollToEnd() } catch { }
+        } catch { Log "add chat failed: $($_.Exception.Message)" }
+    }
+
     function Open-Chat {
         Show-Panel 'chat'
         if (-not $script:bridgeOk) {
-            $replyText.Text = 'AI 服务暂时不可用（本地规划服务没连上）。计划查看仍然可用。'
-            $replyText.Visibility = 'Visible'
+            Add-PetChat 'ai' 'AI 服务暂时不可用（本地规划服务没连上）。计划查看仍然可用。' '#C98A18'
             Set-PanelHeight
         }
         $chatInput.Focus() | Out-Null
@@ -530,8 +566,9 @@ public static class PetNative {
             if (-not (Initialize-Bridge $dataDir)) { Show-Bubble '我连不上自己的大脑……服务没起。' 3000; return }
         }
         $chatInput.Text = ''
-        $replyText.Text = '……'
-        $replyText.Visibility = 'Visible'
+        Add-PetChat 'me' $text
+        $script:thinkingBorder = $null
+        Add-PetChat 'ai' '……'
         Set-State 'THINKING' 0
         $script:chatReqId++
         $script:chatSeq = $script:chatReqId
@@ -540,20 +577,20 @@ public static class PetNative {
             if ($script:chatReqId -ne $script:chatSeq) { return }
             if ($err) {
                 Log "chat failed: $err"
+                Remove-LastPetChat
                 if ($err -like '*no-bridge*' -or $err -like '*服务未运行*' -or $err -like '*refused*' -or $err -like '*拒绝*') {
                     [void](Sync-Bridge $dataDir)
-                    $replyText.Text = '我和大脑断开了（规划服务重启过），已经自动重连，你再发一次试试。'
+                    Add-PetChat 'ai' '我和大脑断开了（规划服务重启过），已经自动重连，你再发一次试试。' '#C98A18'
                 } else {
-                    $replyText.Text = "出错了：$err"
+                    Add-PetChat 'ai' "出错了：$err" '#D0454F'
                 }
                 Set-State 'ERROR' 2600
                 return
             }
             $reply = [string](Get-Field $json 'reply' '')
             if (-not $reply) { $reply = '……我没想好怎么回答。' }
-            $replyText.Text = $reply
-            $replyText.Visibility = 'Visible'
-            Set-PanelHeight
+            Remove-LastPetChat
+            Add-PetChat 'ai' $reply
             Set-State 'TALKING' ([Math]::Min(6000, 1200 + $reply.Length * 90))
         }
     }
@@ -1148,6 +1185,12 @@ public static class PetNative {
                 $cmdText = ''
                 try { $cmdText = (Get-Content $flag -Raw).Trim() } catch { }
                 Remove-Item $flag -ErrorAction SilentlyContinue
+                if ($cmdText -like 'chattest:*') {
+                    $msg = $cmdText.Substring(9)
+                    Show-Panel 'chat'
+                    $script:chatInputBox.Text = $msg
+                    Send-Chat
+                }
                 if ($cmdText -eq 'settings') { Show-SettingsDialog }
                 if ($cmdText -eq 'reminder') {
                     $fake = [pscustomobject]@{

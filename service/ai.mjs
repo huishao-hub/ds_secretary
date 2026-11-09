@@ -691,6 +691,7 @@ export function createAI({
         '你是用户的桌面 AI 秘书，说话简洁、具体、像真人。',
         '只能基于下面提供的真实计划摘要回答；摘要里没有的，就说不知道并建议用户先规划。禁止编造计划项、数字或完成情况。',
         '不要使用 Markdown 标题，不要输出代码块。',
+        '回答控制在 180 字以内；确实需要多条时用「-」开头的短句，最多 5 条。',
         `真实数据摘要：\n${contextText(ctx)}`,
       ].join('\n');
       const messages = [{ role: 'system', content: sys }];
@@ -698,7 +699,7 @@ export function createAI({
         messages.push({ role: 'system', content: `调用方补充上下文：${JSON.stringify(context).slice(0, 800)}` });
       }
       messages.push({ role: 'user', content: String(text || '') });
-      const res = await callModel(messages, { json: false, maxTokens: 600 });
+      const res = await callModel(messages, { json: false, maxTokens: 1200 });
       if (res.ok) {
         return { reply: String(res.content).trim(), mode: 'api', model: AI_MODEL, usedContext: { items: usedItems } };
       }
